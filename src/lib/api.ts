@@ -1,4 +1,5 @@
 const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+
 // Define types for structured job data
 export interface JobRequirements {
   skills: string[];
@@ -10,6 +11,11 @@ export interface JobMeta {
   location: string;
   level: string;
   department: string;
+}
+
+// Define type for otherContacts (assumed to be string key-value pairs)
+export interface HeadhuntOtherContacts {
+  [key: string]: string;
 }
 
 // Helper: get token from localStorage 'user' object (keeps parity with AuthContext)
@@ -57,7 +63,7 @@ export async function signup(userData: {
 }
 
 // Login: returns { token, user }
-export async function login(credentials: { email: string; password: string; }) {
+export async function login(credentials: { email: string; password: string }) {
   const res = await fetch(`${API_BASE}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -105,7 +111,7 @@ export async function fetchJobs() {
   return res.json();
 }
 
-// FIXED: Accept structured requirements & meta, stringify before sending
+// Accept structured requirements & meta, stringify before sending
 export async function createJob(jobData: {
   title: string;
   description: string;
@@ -157,23 +163,23 @@ export async function getMyJobs() {
 
 // Update job details (partial update) - PATCH
 export async function updateJobDetails(
-  id: string, 
+  id: string,
   jobData: {
     title?: string;
     description?: string;
     salary?: number;
     duration?: string;
     contractType?: string;
-    requirements?: string;
-    meta?: string;
+    requirements?: string; // already stringified
+    meta?: string;         // already stringified
   }
 ) {
   const res = await fetch(`${API_BASE}/jobs/${id}`, {
-    method: 'PATCH',
+    method: "PATCH",
     headers: createAuthHeaders(),
     body: JSON.stringify(jobData),
   });
-  
+
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message || "Failed to update job details");
   return body; // expect { message: 'Job updated successfully', job: {...} }
@@ -182,11 +188,11 @@ export async function updateJobDetails(
 // Update job status
 export async function updateJobStatus(id: string, status: string) {
   const res = await fetch(`${API_BASE}/jobs/${id}/status`, {
-    method: 'PUT',
+    method: "PUT",
     headers: createAuthHeaders(),
     body: JSON.stringify({ status }),
   });
-  
+
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message || "Failed to update job status");
   return body;
@@ -194,10 +200,10 @@ export async function updateJobStatus(id: string, status: string) {
 
 export async function deleteJob(id: string) {
   const res = await fetch(`${API_BASE}/jobs/${id}`, {
-    method: 'DELETE',
+    method: "DELETE",
     headers: createAuthHeaders(),
   });
-  
+
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message || "Failed to delete job");
   return body; // expect { message: 'Job deleted successfully' }
@@ -206,35 +212,34 @@ export async function deleteJob(id: string) {
 // APPLICATION ROUTES (/api/applications)
 export async function applyToJob(jobId: string, resumeFile: File, coverLetter?: string) {
   const formData = new FormData();
-  formData.append('resume', resumeFile);
+  formData.append("resume", resumeFile);
   if (coverLetter) {
-    formData.append('coverLetter', coverLetter);
+    formData.append("coverLetter", coverLetter);
   }
-  
+
   const token = getAuthToken();
   const headers: HeadersInit = {};
   if (token) {
     headers.Authorization = `Bearer ${token}`;
   }
-  
+
   // Changed to match backend route: /:id/apply instead of /:jobId/apply
   const res = await fetch(`${API_BASE}/applications/${jobId}/apply`, {
-    method: 'POST',
+    method: "POST",
     headers,
     body: formData,
   });
-  
+
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message || "Failed to apply to job");
-  return body; 
+  return body;
 }
-
 
 export async function getApplicationsForJob(jobId: string) {
   const res = await fetch(`${API_BASE}/applications/job/${jobId}`, {
     headers: createAuthHeaders(),
   });
-  
+
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message || "Failed to fetch applications");
   return body;
@@ -242,10 +247,10 @@ export async function getApplicationsForJob(jobId: string) {
 
 export async function selectApplicant(jobId: string, applicationId: string) {
   const res = await fetch(`${API_BASE}/applications/job/${jobId}/select/${applicationId}`, {
-    method: 'POST',
+    method: "POST",
     headers: createAuthHeaders(),
   });
-  
+
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message || "Failed to select applicant");
   return body;
@@ -253,10 +258,10 @@ export async function selectApplicant(jobId: string, applicationId: string) {
 
 export async function rejectApplicant(jobId: string, applicationId: string) {
   const res = await fetch(`${API_BASE}/applications/job/${jobId}/reject/${applicationId}`, {
-    method: 'POST',
+    method: "POST",
     headers: createAuthHeaders(),
   });
-  
+
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message || "Failed to reject applicant");
   return body;
@@ -264,18 +269,16 @@ export async function rejectApplicant(jobId: string, applicationId: string) {
 
 export async function reviewApplicant(jobId: string, applicationId: string) {
   const res = await fetch(`${API_BASE}/applications/job/${jobId}/review/${applicationId}`, {
-    method: 'POST',
+    method: "POST",
     headers: createAuthHeaders(),
   });
-  
+
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message || "Failed to mark applicant as reviewed");
   return body;
 }
 
-
-// HEADHUNT ROUTES (/api/headhunt) - You'll need to implement these based on your headhunt.js file
-// Create headhunt request with embedded job creation
+// HEADHUNT ROUTES (/api/headhunt)
 export async function createHeadhuntRequest(headhuntData: {
   // Job details (required for creating the private job)
   title: string;
@@ -283,14 +286,13 @@ export async function createHeadhuntRequest(headhuntData: {
   salary?: number;
   duration?: string;
   contractType: string;
-  requirements?: any;
-  meta?: any;
-  
+  requirements?: JobRequirements;
+  meta?: JobMeta;
   // Headhunt request details
   companyName: string;
   contactEmail?: string;
   contactPhone?: string;
-  otherContacts?: any;
+  otherContacts?: HeadhuntOtherContacts;
   urgency?: string;
   preferredContactMethod?: string;
   notes?: string;
@@ -304,11 +306,11 @@ export async function createHeadhuntRequest(headhuntData: {
   };
 
   const res = await fetch(`${API_BASE}/headhunt`, {
-    method: 'POST',
+    method: "POST",
     headers: createAuthHeaders(),
     body: JSON.stringify(payload),
   });
-  
+
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message || "Failed to create headhunt request");
   return body;
@@ -319,7 +321,7 @@ export async function getMyHeadhuntRequests() {
   const res = await fetch(`${API_BASE}/headhunt/my`, {
     headers: createAuthHeaders(),
   });
-  
+
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message || "Failed to fetch headhunt requests");
   return body;
@@ -328,11 +330,11 @@ export async function getMyHeadhuntRequests() {
 // Assign a recruiter to headhunt request
 export async function assignRecruiterToHeadhunt(requestId: string, assignedTo: string) {
   const res = await fetch(`${API_BASE}/headhunt/${requestId}/assign`, {
-    method: 'PUT',
+    method: "PUT",
     headers: createAuthHeaders(),
     body: JSON.stringify({ assignedTo }),
   });
-  
+
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message || "Failed to assign recruiter");
   return body;
@@ -340,7 +342,7 @@ export async function assignRecruiterToHeadhunt(requestId: string, assignedTo: s
 
 // Fulfill headhunt request (mark as completed with candidate)
 export async function fulfillHeadhuntRequest(
-  requestId: string, 
+  requestId: string,
   fulfillmentData: {
     applicationId?: string;
     candidateName?: string;
@@ -348,17 +350,17 @@ export async function fulfillHeadhuntRequest(
   }
 ) {
   const res = await fetch(`${API_BASE}/headhunt/${requestId}/fulfill`, {
-    method: 'PUT',
+    method: "PUT",
     headers: createAuthHeaders(),
     body: JSON.stringify(fulfillmentData),
   });
-  
+
   const body = await res.json().catch(() => ({}));
   if (!res.ok) throw new Error(body?.message || "Failed to fulfill headhunt request");
   return body;
 }
 
-// USER PROFILE FUNCTIONS (if you have user profile endpoints)
+// USER PROFILE FUNCTIONS
 export async function getUserProfile() {
   const res = await fetch(`${API_BASE}/auth/profile`, {
     headers: createAuthHeaders(),
@@ -371,9 +373,9 @@ export async function getUserProfile() {
 // Get employee's own job applications
 export async function getMyApplications() {
   const res = await fetch(`${API_BASE}/applications/my`, {
-    method: 'GET',
+    method: "GET",
     headers: createAuthHeaders(),
-    cache: 'no-store', // ensures fresh data
+    cache: "no-store", // ensures fresh data
   });
 
   const body = await res.json().catch(() => ({}));
@@ -384,9 +386,9 @@ export async function getMyApplications() {
 // Employer: Get all OPEN jobs and their corresponding applications
 export async function getOpenJobsWithApplications() {
   const res = await fetch(`${API_BASE}/applications/employer/open`, {
-    method: 'GET',
+    method: "GET",
     headers: createAuthHeaders(),
-    cache: 'no-store', // always fetch fresh data
+    cache: "no-store", // always fetch fresh data
   });
 
   const body = await res.json().catch(() => ({}));
@@ -395,7 +397,5 @@ export async function getOpenJobsWithApplications() {
     throw new Error(body?.message || "Failed to fetch open jobs with applications");
   }
 
-  return body; 
-
+  return body;
 }
-

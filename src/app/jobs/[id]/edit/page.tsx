@@ -109,8 +109,12 @@ export default function EditJobPage() {
             department: jobData.meta?.department || ""
           }
         });
-      } catch (err: any) {
-        setError(err.message || "Failed to load job");
+      } catch (err) {
+        if (err instanceof Error && err.message === "Job not found"){
+            setError("The job you're looking for does not exist or has been removed");
+        } else{
+            setError("failed to load job details");
+        }       
         console.error("Error fetching job:", err);
       } finally {
         setLoading(false);
@@ -186,8 +190,12 @@ export default function EditJobPage() {
       
       // Redirect to job page after successful update
       router.push(`/jobs/${jobId}`);
-    } catch (err: any) {
-      setError(err.message || "Failed to update job");
+    } catch (err) {
+      if (err instanceof Error && err.message){
+        setError(err.message || "Failed to update job");
+      }else{
+        setError("failed to update job");
+      }
       console.error("Error updating job:", err);
     } finally {
       setSubmitting(false);

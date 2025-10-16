@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useAuth } from "@/context/AuthContext";
 import { getOpenJobsWithApplications, selectApplicant, rejectApplicant, reviewApplicant } from "@/lib/api";
 import toast from 'react-hot-toast';
+import Link from 'next/link'; // Import Link
 
 interface Applicant {
   id: string;
@@ -17,7 +18,7 @@ interface Application {
   applicantId: string;
   resumeUrl: string;
   coverLetter: string;
-  extras: Record<string, any>;
+  extras: Record<string, unknown>;
   status: "PENDING" | "REVIEWED" | "ACCEPTED" | "REJECTED";
   appliedAt: string;
   updatedAt: string;
@@ -34,11 +35,18 @@ interface JobWithApplications {
   applications: Application[];
 }
 
+//  Helper to safely extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "An unknown error occurred";
+}
+
 export default function EmployerApplicationsPage() {
   const { user } = useAuth();
   const [jobs, setJobs] = useState<JobWithApplications[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const [error, setError] = useState<string>("");
   const [expandedJob, setExpandedJob] = useState<string | null>(null);
   const [processingApplicationId, setProcessingApplicationId] = useState<string | null>(null);
 
@@ -46,7 +54,7 @@ export default function EmployerApplicationsPage() {
     if (user && user.role === "EMPLOYER") {
       fetchJobsWithApplications();
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    // Removed unnecessary eslint-disable — deps are correct
   }, [user]);
 
   const fetchJobsWithApplications = async () => {
@@ -61,9 +69,9 @@ export default function EmployerApplicationsPage() {
       );
 
       setJobs(jobsWithApplicants);
-    } catch (err: any) {
+    } catch (err) {
       console.error("Failed to fetch jobs with applications:", err);
-      setError(err?.message || "Failed to load applications");
+      setError(getErrorMessage(err) || "Failed to load applications");
     } finally {
       setLoading(false);
     }
@@ -92,9 +100,9 @@ export default function EmployerApplicationsPage() {
         })
       );
       toast.success("Applicant accepted successfully!");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Failed to accept applicant:", err);
-      toast.error(err.message || "Failed to accept applicant. Please try again.");
+      toast.error(getErrorMessage(err) || "Failed to accept applicant. Please try again.");
     } finally {
       setProcessingApplicationId(null);
     }
@@ -123,9 +131,9 @@ export default function EmployerApplicationsPage() {
 
       await rejectApplicant(jobId, applicationId);
       toast.success("Applicant rejected successfully!");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Failed to reject applicant:", err);
-      toast.error(err.message || "Failed to reject applicant. Please try again.");
+      toast.error(getErrorMessage(err) || "Failed to reject applicant. Please try again.");
       fetchJobsWithApplications();
     } finally {
       setProcessingApplicationId(null);
@@ -155,9 +163,9 @@ export default function EmployerApplicationsPage() {
 
       await reviewApplicant(jobId, applicationId);
       toast.success("Applicant marked as reviewed successfully!");
-    } catch (err: any) {
+    } catch (err) {
       console.error("Failed to mark applicant as reviewed:", err);
-      toast.error(err.message || "Failed to update applicant status. Please try again.");
+      toast.error(getErrorMessage(err) || "Failed to update applicant status. Please try again.");
       fetchJobsWithApplications();
     } finally {
       setProcessingApplicationId(null);
@@ -250,8 +258,11 @@ export default function EmployerApplicationsPage() {
             </svg>
           </div>
           <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">No Jobs with Applicants</h3>
-          <p className="text-sm sm:text-base text-muted-foreground mb-4">None of your job postings have received applications yet.</p>
-          <a
+          <p className="text-sm sm:text-base text-muted-foreground mb-4">
+            None of your job postings have received applications yet.
+          </p>
+          {/* Replaced <a> with <Link> */}
+          <Link
             href="/jobs/my"
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 sm:px-6 py-2 rounded-lg transition-colors font-medium text-sm sm:text-base"
           >
@@ -259,7 +270,7 @@ export default function EmployerApplicationsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
             </svg>
             Manage Your Jobs
-          </a>
+          </Link>
         </div>
       ) : (
         <div className="space-y-6">

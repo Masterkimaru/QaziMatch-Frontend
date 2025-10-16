@@ -37,7 +37,7 @@ export default function TermsOfService() {
                 title: 'Acceptance of Terms',
                 content: (
                   <p>
-                    By accessing or using QaziMatch ("the Platform"), you agree to be bound by these Terms of Service and our Privacy Policy. If you disagree with any part of these terms, you may not access the Platform.
+                    By accessing or using QaziMatch (&quot;the Platform&quot;), you agree to be bound by these Terms of Service and our Privacy Policy. If you disagree with any part of these terms, you may not access the Platform.
                   </p>
                 ),
               },
@@ -46,10 +46,10 @@ export default function TermsOfService() {
                 title: 'Definitions',
                 content: (
                   <ul className="list-disc pl-5 space-y-1">
-                    <li><strong>"Job Seeker"</strong> refers to individuals seeking employment opportunities</li>
-                    <li><strong>"Employer"</strong> refers to companies or individuals posting job opportunities</li>
-                    <li><strong>"Content"</strong> includes job postings, resumes, profiles, and all other materials</li>
-                    <li><strong>"Services"</strong> refers to all features and functionality of the QaziMatch platform</li>
+                    <li><strong>&quot;Job Seeker&quot;</strong> refers to individuals seeking employment opportunities</li>
+                    <li><strong>&quot;Employer&quot;</strong> refers to companies or individuals posting job opportunities</li>
+                    <li><strong>&quot;Content&quot;</strong> includes job postings, resumes, profiles, and all other materials</li>
+                    <li><strong>&quot;Services&quot;</strong> refers to all features and functionality of the QaziMatch platform</li>
                   </ul>
                 ),
               },

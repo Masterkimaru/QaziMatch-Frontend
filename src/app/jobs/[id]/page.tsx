@@ -41,7 +41,7 @@ interface Application {
   appliedAt: string;
   status: string;
   coverLetter?: string;
-  extras?: Record<string, any>;
+  extras?: Record<string, unknown>;
   isHeadhunted?: boolean;
   user?: {
     id: string;
@@ -73,8 +73,13 @@ export default function JobViewPage() {
         setError("");
         const jobData = await getJobById(jobId);
         setJob(jobData);
-      } catch (err: any) {
-        setError(err.message || "Failed to load job");
+      } catch (err) {
+        // err is 'unknown' — safely handle it
+        if (err instanceof Error) {
+          setError(err.message || "Failed to load job");
+        } else {
+          setError("Failed to load job");
+        }
         console.error("Error fetching job:", err);
       } finally {
         setLoading(false);
@@ -99,9 +104,13 @@ export default function JobViewPage() {
       } else {
         throw new Error("Invalid applications data format");
       }
-    } catch (err: any) {
+    } catch (err) {
+      if (err instanceof Error) {
+        setApplicationsError(err.message || "Failed to load applications");
+      } else {
+        setApplicationsError("Failed to load applications");
+      }
       console.error("Error fetching applications:", err);
-      setApplicationsError(err.message || "Failed to load applications");
     } finally {
       setApplicationsLoading(false);
     }
@@ -434,7 +443,6 @@ export default function JobViewPage() {
                     {application.resumeUrl && (
                       <button
                         onClick={() => {
-                          // Handle relative URLs from your API
                           const url = application.resumeUrl.startsWith('http') 
                             ? application.resumeUrl 
                             : `${process.env.NEXT_PUBLIC_API_URL || ''}${application.resumeUrl}`;

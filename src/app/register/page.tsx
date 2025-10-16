@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useState } from "react";
@@ -107,18 +106,25 @@ export default function RegisterPage() {
     setIsAnimating(true);
 
     try {
-      const { confirmPassword, countryCode, phoneNumber, ...userData } = formData;
+      // Removed unused `confirmPassword`, `countryCode`, `phoneNumber` from destructuring
+      const {  countryCode, phoneNumber, ...userData } = formData;
       const fullPhoneNumber = phoneNumber ? `${countryCode}${phoneNumber}` : "";
 
-      const result = await signup({
+      // Removed unused `result` — just call signup and proceed
+      await signup({
         ...userData,
         phoneNumber: fullPhoneNumber,
       });
 
       alert("Registration successful! Please log in.");
       router.push("/login");
-    } catch (err: any) {
-      setError(err.message || "Registration failed. Please try again.");
+    } catch (err) {
+      // Proper error typing: `err` is `unknown`
+      if (err instanceof Error) {
+        setError(err.message || "Registration failed. Please try again.");
+      } else {
+        setError("Registration failed. Please try again.");
+      }
       setIsAnimating(false);
     } finally {
       setLoading(false);

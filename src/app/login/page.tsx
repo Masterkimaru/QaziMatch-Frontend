@@ -2,11 +2,9 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import { useAuth } from "@/context/AuthContext";
 
 export default function LoginPage() {
-  const router = useRouter();
   const { loginWithCredentials } = useAuth();
 
   const [email, setEmail] = useState("");
@@ -23,8 +21,12 @@ export default function LoginPage() {
 
     try {
       await loginWithCredentials(email, password);
-    } catch (err: any) {
-      setError(err.message || "Login failed. Please try again.");
+    } catch (err) {
+      if (err instanceof Error && err.message){
+        setError(err.message || "Login failed. Please try again.");
+      }else{
+        setError("Login failed. Please try again.");
+      }
       setIsAnimating(false);
     } finally {
       setLoading(false);

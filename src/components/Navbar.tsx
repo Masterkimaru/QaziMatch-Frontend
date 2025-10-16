@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState, useRef, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import Image from 'next/image';
 import { useAuth } from "@/context/AuthContext";
 
 export default function Navbar() {
@@ -10,7 +10,7 @@ export default function Navbar() {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
-  const router = useRouter();
+  
   const dropdownRef = useRef<HTMLDivElement>(null);
   const mobileMenuRef = useRef<HTMLDivElement>(null);
 
@@ -77,10 +77,12 @@ export default function Navbar() {
               className="flex items-center space-x-3 group transition-all duration-300 hover:scale-105"
             >
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300">
-                <img
-                  src="/Qazi-logo.png"
-                  alt="Logo"
-                  className="w-5 h-5 object-contain"
+                <Image
+                    src="/Qazi-logo.png"
+                    alt="Logo"
+                    width={20}
+                    height={20}
+                    className="w-5 h-5 object-contain"
                 />
               </div>
               <span className="text-2xl font-bold bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent hover:from-accent hover:via-primary hover:to-accent transition-all duration-500">

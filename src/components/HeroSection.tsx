@@ -37,7 +37,7 @@ export default function HeroSection() {
               lineHeight: "1.6",
             }}
           >
-            Whether you're a professional seeking your next breakthrough or a company scaling your team — 
+            Whether you&apos;re a professional seeking your next breakthrough or a company scaling your team —
             we connect the right talent with the right opportunity in finance and technology.
           </p>
         </motion.section>
@@ -164,7 +164,7 @@ export default function HeroSection() {
               className="text-gray-600 max-w-2xl mx-auto px-2"
               style={{ fontSize: "clamp(0.85rem, 2vw, 1.1rem)" }}
             >
-              We're not just another job board — we're a curated ecosystem for the future of finance.
+              We&apos;re not just another job board — we&apos;re a curated ecosystem for the future of finance.
             </p>
           </div>
 

@@ -1,6 +1,42 @@
 import Link from "next/link";
 
-export default function JobCard({ job }: { job: any }) {
+interface Employer {
+  id?: string;
+  name?: string;
+  email?: string;
+}
+
+interface JobMeta {
+  location?: string;
+  level?: string;
+  department?: string;
+}
+
+interface JobRequirements {
+  skills?: string;
+  education?: string;
+  experience?: string;
+}
+
+interface Job {
+  id: string;
+  title: string;
+  description?: string;
+  salary?: number;
+  contractType?: string;
+  duration?: string;
+  employer?: Employer;
+  meta?: JobMeta;
+  requirements?: JobRequirements;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+interface JobCardProps {
+  job: Job;
+}
+
+export default function JobCard({ job }: JobCardProps) {
   const companyName = job.employer?.name || "Unknown Company";
   const location = job.meta?.location || "Location not specified";
   const salary = job.salary ? `KSH ${job.salary.toLocaleString()}` : "Salary not disclosed";

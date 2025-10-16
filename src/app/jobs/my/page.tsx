@@ -5,6 +5,13 @@ import { useAuth } from "@/context/AuthContext";
 import { getMyJobs } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "An unknown error occurred";
+}
+
 interface JobRequirements {
   skills: string[];
   education: string;
@@ -60,8 +67,8 @@ export default function MyJobsPage() {
         setError("");
         const jobsData = await getMyJobs();
         setJobs(jobsData);
-      } catch (err: any) {
-        setError(err.message || "Failed to load your jobs");
+      } catch (err) {
+        setError(getErrorMessage(err) || "Failed to load your jobs");
         console.error("Error fetching employer jobs:", err);
       } finally {
         setLoading(false);

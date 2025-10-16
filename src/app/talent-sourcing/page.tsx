@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { useAuth } from "@/context/AuthContext";
 import { createHeadhuntRequest } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
@@ -34,7 +33,6 @@ interface HeadhuntFormData {
 }
 
 export default function TalentSourcingPage() {
-  const { user } = useAuth();
   const router = useRouter();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
@@ -93,34 +91,43 @@ export default function TalentSourcingPage() {
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsSubmitting(true);
-    setError("");
-    setSuccess("");
+  e.preventDefault();
+  setIsSubmitting(true);
+  setError("");
+  setSuccess("");
 
-    try {
-      // Prepare the data for API
-      const apiData = {
-        // Job details
-        title: formData.title,
-        description: formData.description,
-        salary: formData.salary ? Number(formData.salary) : undefined,
-        duration: formData.duration || undefined,
-        contractType: formData.contractType,
-        requirements: formData.requirements,
-        meta: formData.meta,
-        
-        // Headhunt request details
-        companyName: formData.companyName,
-        contactEmail: formData.contactEmail,
-        contactPhone: formData.contactPhone || undefined,
-        otherContacts: formData.otherContacts ? { notes: formData.otherContacts } : undefined,
-        urgency: formData.urgency,
-        preferredContactMethod: formData.preferredContactMethod,
-        notes: formData.notes || undefined
-      };
+  try {
+    // Parse skills string into array (trim and filter empty)
+    const skillsArray = formData.requirements.skills
+      .split(',')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
 
-      const result = await createHeadhuntRequest(apiData);
+    // Prepare the data for API
+    const apiData = {
+      // Job details
+      title: formData.title,
+      description: formData.description,
+      salary: formData.salary ? Number(formData.salary) : undefined,
+      duration: formData.duration || undefined,
+      contractType: formData.contractType,
+      requirements: {
+        ...formData.requirements,
+        skills: skillsArray, // now string[]
+      },
+      meta: formData.meta,
+      
+      // Headhunt request details
+      companyName: formData.companyName,
+      contactEmail: formData.contactEmail,
+      contactPhone: formData.contactPhone || undefined,
+      otherContacts: formData.otherContacts ? { notes: formData.otherContacts } : undefined,
+      urgency: formData.urgency,
+      preferredContactMethod: formData.preferredContactMethod,
+      notes: formData.notes || undefined,
+    };
+
+      await createHeadhuntRequest(apiData);
       
       setSuccess("Headhunt request created successfully! Our team will contact you soon.");
       
@@ -149,11 +156,13 @@ export default function TalentSourcingPage() {
         preferredContactMethod: "EMAIL",
         notes: ""
       });
-    // optionally navigate to a success page or job list
-       router.push("/jobs");
+      
+      // optionally navigate to a success page or job list
+      router.push("/jobs");
 
-    } catch (err: any) {
-      setError(err.message || "Failed to create headhunt request");
+    } catch (err: unknown) {
+      const errorMessage = err instanceof Error ? err.message : "Failed to create headhunt request";
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
@@ -169,7 +178,7 @@ export default function TalentSourcingPage() {
           </h1>
           <p className="text-sm sm:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed px-2 sm:px-0">
             Let our expert recruiters find the perfect talent for your specialized roles. 
-            We'll handle the search while you focus on what matters most.
+            We&apos;ll handle the search while you focus on what matters most.
           </p>
         </div>
 
@@ -371,7 +380,7 @@ export default function TalentSourcingPage() {
                                text-foreground placeholder:text-muted-foreground text-sm sm:text-base
                                hover:border-primary/50
                                shadow-sm resize-vertical"
-                      placeholder="e.g., Bachelor's in Computer Science..."
+                      placeholder="e.g., Bachelor&apos;s in Computer Science..."
                     />
                   </div>
                   <div className="sm:col-span-2 lg:col-span-1">

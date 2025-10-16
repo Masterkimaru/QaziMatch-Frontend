@@ -2,13 +2,19 @@
 
 import { useState, useRef, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { useAuth } from "@/context/AuthContext";
 import { applyToJob } from "@/lib/api";
+
+//  Helper to safely extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "An unknown error occurred";
+}
 
 export default function JobApplicationPage() {
   const params = useParams();
   const router = useRouter();
-  const { user } = useAuth();
+  // Removed unused `user` from AuthContext since it's commented out and not used
   const [resumeFile, setResumeFile] = useState<File | null>(null);
   const [coverLetter, setCoverLetter] = useState("");
   const [loading, setLoading] = useState(false);
@@ -35,12 +41,6 @@ export default function JobApplicationPage() {
       if (timer) clearTimeout(timer);
     };
   }, [showSuccessPopup, countdown, router, jobId]);
-
-  // Redirect if not employee
-  //if (!user || user.role !== "EMPLOYEE") {
-  //  router.push("/jobs");
-  //  return null;
-  //}
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0] || null;
@@ -95,9 +95,9 @@ export default function JobApplicationPage() {
       setShowSuccessPopup(true);
       setCountdown(5); // Reset countdown to 5 seconds
       
-    } catch (err: any) {
+    } catch (err) {
       console.error("Application error:", err);
-      setError(err.message || "Failed to submit application. Please try again.");
+      setError(getErrorMessage(err) || "Failed to submit application. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -133,7 +133,7 @@ export default function JobApplicationPage() {
             </div>
             
             <p className="text-muted-foreground mb-6">
-              Your application has been successfully submitted. The employer will review your resume and cover letter and contact you if you're a good fit for the position.
+              Your application has been successfully submitted. The employer will review your resume and cover letter and contact you if you{`'`}re a good fit for the position.
             </p>
             
             <div className="flex gap-3">
@@ -295,7 +295,7 @@ export default function JobApplicationPage() {
         <h3 className="font-semibold text-blue-900 dark:text-blue-100 mb-2">Application Tips</h3>
         <ul className="text-sm text-blue-800 dark:text-blue-200 space-y-1">
           <li>• Ensure your resume is up-to-date and relevant to the position</li>
-          <li>• Tailor your cover letter to highlight why you're a good fit</li>
+          <li>• Tailor your cover letter to highlight why you{`'`}re a good fit</li>
           <li>• Double-check for any spelling or grammatical errors</li>
           <li>• Make sure your contact information is current</li>
         </ul>

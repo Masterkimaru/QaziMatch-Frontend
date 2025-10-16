@@ -37,7 +37,7 @@ export default function ResumeOptimizationPage() {
           </h1>
           <p className="text-xs xs:text-sm sm:text-base text-[var(--muted-foreground)] leading-relaxed max-w-2xl mx-auto px-1">
             Upload your CV and let us help you professionally revamp it.  
-            You can also include any notes or preferences you'd like us to consider.
+            You can also include any notes or preferences you&apos;d like us to consider.
           </p>
         </div>
 
@@ -134,7 +134,7 @@ export default function ResumeOptimizationPage() {
                 ✅ Your CV has been successfully submitted for optimization!
               </p>
               <p className="text-green-500 text-xs sm:text-sm mt-1">
-                We'll review it and get back to you soon.
+                We&apos;ll review it and get back to you soon.
               </p>
             </div>
           )}

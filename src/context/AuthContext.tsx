@@ -90,6 +90,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
     } catch (err) {
       // ignore — we still clear client session
+      console.error("Error during logout", err);
     } finally {
       setUser(null);
       persistUser(null);

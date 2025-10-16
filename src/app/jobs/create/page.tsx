@@ -5,6 +5,13 @@ import { useAuth } from "@/context/AuthContext";
 import { createJob } from "@/lib/api";
 import { useRouter } from "next/navigation";
 
+// Helper to safely extract error message
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error) return error.message;
+  if (typeof error === "string") return error;
+  return "An unknown error occurred";
+}
+
 export default function CreateJobPage() {
   const { user } = useAuth();
   const router = useRouter();
@@ -92,8 +99,9 @@ export default function CreateJobPage() {
 
       await createJob(jobData);
       router.push("/jobs/my");
-    } catch (err: any) {
-      setError(err.message || "Failed to create job");
+    } catch (err) {
+      const message = getErrorMessage(err);
+      setError(message || "Failed to create job");
       console.error("Error creating job:", err);
     } finally {
       setLoading(false);

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { useAuth } from "@/context/AuthContext";
 import { getMyApplications } from "@/lib/api";
 
@@ -10,7 +11,7 @@ interface JobApplication {
   appliedAt: string;
   resumeUrl: string;
   coverLetter: string;
-  extras: Record<string, any>;
+  extras: Record<string, unknown>; // Replaced `any` with `unknown`
   job: {
     id: string;
     title: string;
@@ -46,9 +47,14 @@ export default function MyApplicationsPage() {
       setError("");
       const data: ApplicationsResponse = await getMyApplications();
       setApplications(data.applications || []);
-    } catch (err: any) {
+    } catch (err) {
+      // Proper error typing: `err` is `unknown`
+      if (err instanceof Error) {
+        setError(err.message || "Failed to load your applications");
+      } else {
+        setError("Failed to load your applications");
+      }
       console.error("Failed to fetch applications:", err);
-      setError(err.message || "Failed to load your applications");
     } finally {
       setLoading(false);
     }
@@ -128,9 +134,9 @@ export default function MyApplicationsPage() {
           </div>
           <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-2">No Applications Yet</h3>
           <p className="text-sm sm:text-base text-muted-foreground mb-4">
-            You haven't applied to any jobs yet. Start browsing available positions to apply.
+            You haven&apos;t applied to any jobs yet. Start browsing available positions to apply.
           </p>
-          <a
+          <Link
             href="/jobs"
             className="inline-flex items-center gap-2 bg-primary text-primary-foreground hover:bg-primary/90 px-4 sm:px-6 py-2 rounded-lg transition-colors font-medium text-sm sm:text-base"
           >
@@ -138,7 +144,7 @@ export default function MyApplicationsPage() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             Browse Jobs
-          </a>
+          </Link>
         </div>
       ) : (
         <div className="space-y-6">
@@ -218,7 +224,7 @@ export default function MyApplicationsPage() {
 
                 {/* Actions */}
                 <div className="flex flex-col gap-2 w-full lg:w-auto lg:items-end">
-                  <a
+                  <Link
                     href={`/jobs/${application.job.id}`}
                     className="inline-flex items-center justify-center sm:justify-start gap-1.5 bg-primary text-primary-foreground hover:bg-primary/90 px-3 py-1.5 sm:px-4 sm:py-2 rounded text-xs sm:text-sm transition-colors w-full lg:w-auto"
                   >
@@ -227,7 +233,7 @@ export default function MyApplicationsPage() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                     <span>View Job</span>
-                  </a>
+                  </Link>
 
                   {application.resumeUrl && (
                     <a
