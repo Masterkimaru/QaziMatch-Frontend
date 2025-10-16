@@ -78,7 +78,7 @@ export default function Navbar() {
             >
               <div className="w-8 h-8 bg-gradient-primary rounded-lg flex items-center justify-center shadow-md group-hover:shadow-lg transition-all duration-300">
                 <Image
-                    src="/Qazi-logo.png"
+                    src="/kazi_logo.png"
                     alt="Logo"
                     width={20}
                     height={20}

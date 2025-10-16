@@ -8,14 +8,11 @@ export const metadata = {
   description: "Find and post jobs easily",
   metadataBase: new URL("https://qazimatch.com"),
   icons: {
-    icon: "/Qazi-logo.png", // Favicon (used in browser tab)
-    shortcut: "/Qazi-logo.png",
-    apple: "/Qazi-logo.png", // Apple touch icon
+    icon: "/kazi_logo.png", // This should work if file is in public folder
+    shortcut: "/kazi_logo.png",
+    apple: "/kazi_logo.png",
   },
-  // Optional: Open Graph image for social sharing
-  openGraph: {
-    images: ["/Qazi-logo.png"],
-  },
+ 
 };
 
 
