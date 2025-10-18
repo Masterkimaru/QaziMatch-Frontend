@@ -20,7 +20,7 @@ export default function Footer() {
             Terms of Service
           </a>
           <a
-            href="mailto:support@jobportal.com"
+            href="/contact"
             className="hover:text-blue-600 transition-colors"
           >
             Contact

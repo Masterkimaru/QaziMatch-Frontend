@@ -8,25 +8,45 @@ export default function ResumeOptimizationPage() {
   const [file, setFile] = useState<File | null>(null);
   const [notes, setNotes] = useState("");
   const [loading, setLoading] = useState(false);
+  const [userEmail, setUserEmail] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fullName || !file) return alert("Please provide your full name and upload your CV.");
+    if (!fullName || !file || !userEmail) {
+      alert("Please provide your full name, email, and upload your CV.");
+      return;
+    }
 
     setLoading(true);
     setSubmitted(false);
 
-    // Simulate upload (replace with real backend endpoint later)
-    setTimeout(() => {
-      setLoading(false);
-      setSubmitted(true);
-      setFullName("");
-      setFile(null);
-      setNotes("");
-    }, 1500);
-  };
+    const formData = new FormData();
+    formData.append("fullName", fullName);
+    formData.append("userEmail", userEmail);
+    formData.append("notes", notes);
+    formData.append("cv", file);
 
+    try {
+      const res = await fetch("/api/submit-resume", {
+        method: "POST",
+        body: formData,
+      });
+
+      if (res.ok) {
+        setSubmitted(true);
+        setFullName("");
+        setUserEmail("");
+        setFile(null);
+        setNotes("");
+      } else {
+        const data = await res.json();
+        alert(data.error || "Submission failed. Please try again.");
+      }
+    }finally {
+      setLoading(false);
+    }
+  };
   return (
     <div className="min-h-screen flex items-center justify-center p-3 xs:p-4 sm:p-6 bg-[var(--background)] text-[var(--foreground)]">
       <div className="w-full max-w-2xl bg-[var(--secondary)] rounded-xl sm:rounded-2xl shadow-lg border border-[var(--border)] p-4 sm:p-6 md:p-8 lg:p-10 transition-all hover:shadow-xl">
@@ -112,6 +132,19 @@ export default function ResumeOptimizationPage() {
           </div>
 
           {/* Submit Button */}
+          <div>
+            <label className="block text-xs sm:text-sm font-medium mb-1 sm:mb-2">
+              Your Email
+            </label>
+            <input
+              type="email"
+              value={userEmail}
+              onChange={(e) => setUserEmail(e.target.value)}
+              placeholder="youremail@example.com"
+              className="w-full p-2 sm:p-3 text-sm sm:text-base border rounded-lg bg-[var(--muted)] text-[var(--foreground)] border-[var(--border)] focus:ring-2 focus:ring-[var(--ring)] outline-none"
+              required
+            />
+          </div>
           <button
             type="submit"
             disabled={loading}
@@ -131,7 +164,7 @@ export default function ResumeOptimizationPage() {
           {submitted && (
             <div className="text-center p-3 sm:p-4 bg-green-50 border border-green-200 rounded-lg">
               <p className="text-green-600 text-sm sm:text-base font-medium">
-                ✅ Your CV has been successfully submitted for optimization!
+                 Your CV has been successfully submitted for optimization!
               </p>
               <p className="text-green-500 text-xs sm:text-sm mt-1">
                 We&apos;ll review it and get back to you soon.

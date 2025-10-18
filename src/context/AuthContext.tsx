@@ -10,14 +10,16 @@ type User = {
   role: "EMPLOYEE" | "EMPLOYER";
   name?: string;
   token: string;
+  phoneNumber?: string;
+  createdAt?: string;
 };
 
 type AuthContextType = {
   user: User | null;
-  login: (userData: User) => void; // set user directly (used by login page)
-  loginWithCredentials: (email: string, password: string) => Promise<void>; // convenience: calls API then login()
+  login: (userData: User) => void;
+  loginWithCredentials: (email: string, password: string) => Promise<void>;
   logout: () => Promise<void>;
-  refreshUser: () => Promise<User>; // refresh profile from server
+  refreshUser: () => Promise<User>;
 };
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -26,7 +28,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const router = useRouter();
 
-  // load user from localStorage on mount
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
@@ -40,7 +41,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  // keep user in localStorage (single source of truth)
   const persistUser = useCallback((u: User | null) => {
     if (typeof window === "undefined") return;
     if (u) {
@@ -50,12 +50,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   }, []);
 
-  // basic login by providing the final user object (id,email,role,name,token)
   const login = (userData: User) => {
     setUser(userData);
     persistUser(userData);
-
-    // redirect based on role
     if (userData.role === "EMPLOYER") {
       router.push("/jobs/my");
     } else {
@@ -63,7 +60,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // convenience: call backend login endpoint, then call login()
   const loginWithCredentials = async (email: string, password: string) => {
     try {
       const data = await api.login({ email, password }); // expects { token, user }
@@ -73,23 +69,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         name: data.user.name,
         role: data.user.role,
         token: data.token,
+        phoneNumber: data.user.phoneNumber,     // <--- include phone
+        createdAt: data.user.createdAt,         // <--- include createdAt
       };
       login(loggedInUser);
     } catch (err) {
-      // rethrow so callers can show messages
       throw err;
     }
   };
 
-  // logout: call backend (optional) then clear client state
   const logout = async () => {
     try {
-      // attempt server logout (your server just replies 200)
-      await api.logout().catch(() => {
-        /* swallow network errors, we'll still clear client state */
-      });
+      await api.logout().catch(() => {});
     } catch (err) {
-      // ignore — we still clear client session
       console.error("Error during logout", err);
     } finally {
       setUser(null);
@@ -98,24 +90,23 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  // refresh user profile from server (protected route)
   const refreshUser = async () => {
     if (!user) throw new Error("No logged in user");
     try {
-      const body = await api.getProfile(); // expects { user: {...} }
-      const updated = {
+      const body = await api.getProfile(); // { user: {...} }
+      const updated: User = {
         id: body.user.id,
         email: body.user.email,
         name: body.user.name,
         role: body.user.role,
+        phoneNumber: body.user.phoneNumber,   // <--- copy phoneNumber
+        createdAt: body.user.createdAt,       // <--- copy createdAt
         token: user.token, // keep existing token
-      } as User;
+      };
       setUser(updated);
       persistUser(updated);
       return updated;
     } catch (err) {
-      // if token invalid / expired, optionally logout
-      // console.error("Failed to refresh profile", err);
       throw err;
     }
   };

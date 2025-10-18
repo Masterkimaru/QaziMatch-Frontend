@@ -1,4 +1,4 @@
-const API_BASE = process.env.NEXT_PUBLIC_API_URL || "http://localhost:4000/api";
+const API_BASE = process.env.NEXT_PUBLIC_API_URL || "";
 
 // Define types for structured job data
 export interface JobRequirements {
@@ -397,5 +397,16 @@ export async function getOpenJobsWithApplications() {
     throw new Error(body?.message || "Failed to fetch open jobs with applications");
   }
 
+  return body;
+}
+
+// delete user profile either EMPLOYEE or EMPLOYER
+export async function deleteProfile() {
+  const res = await fetch(`${API_BASE}/auth/delete`, {
+    method: "DELETE",
+    headers: createAuthHeaders(),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body?.message || "Failed to delete profile");
   return body;
 }

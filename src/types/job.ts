@@ -1,9 +1,19 @@
 export interface Employer {
-  name: string;
+  id?: string;
+  name?: string;
+  email?: string;
 }
 
 export interface JobMeta {
   location?: string;
+  level?: string;
+  department?: string;
+}
+
+export interface JobRequirements {
+  skills?: string;
+  education?: string;
+  experience?: string;
 }
 
 export interface Job {
@@ -11,8 +21,11 @@ export interface Job {
   title: string;
   description?: string;
   salary?: number;
-  employer?: Employer;
-  meta?: JobMeta;
   contractType?: string;
   duration?: string;
+  employer?: Employer;
+  meta?: JobMeta;
+  requirements?: JobRequirements;
+  createdAt?: string;
+  updatedAt?: string;
 }
