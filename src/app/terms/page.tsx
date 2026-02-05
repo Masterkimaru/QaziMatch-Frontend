@@ -239,15 +239,15 @@ export default function TermsOfService() {
                       <li>
                         Email:{' '}
                         <a
-                          href="mailto:legal@qazimatch.com"
+                          href="mailto:natalia@qazimatch.com"
                           className="hover:underline"
                           style={{ color: 'var(--accent)' }}
                         >
-                          legal@qazimatch.com
+                          natalia@qazimatch.com
                         </a>
                       </li>
-                      <li>Address: [Your Company Address]</li>
-                      <li>Phone: [Your Company Phone]</li>
+                      <li>Address: QaziMatch, Nairobi</li>
+                      <li>Phone: +254 748 090909</li>
                     </ul>
                   </>
                 ),

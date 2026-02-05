@@ -191,8 +191,8 @@ export default function PrivacyPolicy() {
                           privacy@qazimatch.com
                         </a>
                       </li>
-                      <li>Address: [Your Company Address]</li>
-                      <li>Phone: [Your Company Phone]</li>
+                      <li>Address: QaziMatch, Nairobi</li>
+                      <li>Phone: +254 748 090909</li>
                     </ul>
                   </>
                 ),
